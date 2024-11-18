@@ -1,0 +1,175 @@
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: ../organizations/ordererOrganizations/traffic.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+    OrdererEndpoints:
+      - orderer.traffic.com:7050
+  - &TrafficManagement
+    Name: TrafficManagementMSP
+    ID: TrafficManagementMSP
+    MSPDir: ../organizations/peerOrganizations/trafficManagement.traffic.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('TrafficManagementMSP.admin', 'TrafficManagementMSP.peer', 'TrafficManagementMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('TrafficManagementMSP.admin', 'TrafficManagementMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('TrafficManagementMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('TrafficManagementMSP.peer')"
+  - &MVD
+    Name: MVDMSP
+    ID: MVDMSP
+    MSPDir: ../organizations/peerOrganizations/mvd.traffic.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('MVDMSP.admin', 'MVDMSP.peer', 'MVDMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('MVDMSP.admin', 'MVDMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('MVDMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('MVDMSP.peer')"
+  - &LawEnforcement
+    Name: LawEnforcementMSP
+    ID: LawEnforcementMSP
+    MSPDir: ../organizations/peerOrganizations/lawEnforcement.traffic.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('LawEnforcementMSP.admin', 'LawEnforcementMSP.peer', 'LawEnforcementMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('LawEnforcementMSP.admin', 'LawEnforcementMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('LawEnforcementMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('LawEnforcementMSP.peer')"
+  - &InsuranceCompany
+    Name: InsuranceCompanyMSP
+    ID: InsuranceCompanyMSP
+    MSPDir: ../organizations/peerOrganizations/insuranceCompany.traffic.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('InsuranceCompanyMSP.admin', 'InsuranceCompanyMSP.peer', 'InsuranceCompanyMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('InsuranceCompanyMSP.admin', 'InsuranceCompanyMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('InsuranceCompanyMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('InsuranceCompanyMSP.peer')"
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  Addresses:
+    - orderer.traffic.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  ChannelUsingRaft:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      OrdererType: etcdraft
+      EtcdRaft:
+        Consenters:
+          - Host: orderer.traffic.com
+            Port: 7050
+            ClientTLSCert: ../organizations/ordererOrganizations/traffic.com/orderers/orderer.traffic.com/tls/server.crt
+            ServerTLSCert: ../organizations/ordererOrganizations/traffic.com/orderers/orderer.traffic.com/tls/server.crt
+      Organizations:
+        - *OrdererOrg
+      Capabilities: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *TrafficManagement
+        - *MVD
+        - *LawEnforcement
+        - *InsuranceCompany
+      Capabilities: *ApplicationCapabilities

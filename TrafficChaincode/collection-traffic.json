@@ -1,0 +1,10 @@
+[
+    {
+      "name": "ViolationCollection",
+      "policy": "OR('TrafficManagementMSP.member', 'MVDMSP.member', 'LawEnforcementMSP.member')",
+      "requiredPeerCount": 2,
+      "maxPeerCount": 3,
+      "blockToLive": 100,
+      "memberOnlyRead": true
+    }
+]
