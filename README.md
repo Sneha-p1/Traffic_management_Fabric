@@ -49,6 +49,18 @@ git clone git@github.com:Sneha-p1/Traffic_management_Fabric.git
 ```html
 ./stopTrafficNetwork.sh
 ```
+3. Deploy Chaincode:
+- Navigate to the chaincode folder and deploy trafficContract using the Fabric CLI.
+4. Run the TrafficTrack App:
+- Navigate to the `TrafficManagementApp` directory and install dependencies:
+```html
+npm install
+```
+- To stop the network, use:
+```html
+npm run dev
+```
+
 
 
 
