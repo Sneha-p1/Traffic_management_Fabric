@@ -36,7 +36,19 @@ Prerequisites
 - Node.js
 - Hyperledger Fabric binaries and samples
 ## Installation Steps
-Clone the repository:
+1. Clone the repository:
+```html
+git clone git@github.com:Sneha-p1/Traffic_management_Fabric.git
+```
+2. Set up Hyperledger Fabric network:
+- Navigate to the `Fabric-network-Traffic` folder and run the following script to bring up the Fabric network:
+```html
+./startTrafficNetwork1.sh
+```
+- To stop the network, use:
+```html
+./stopTrafficNetwork.sh
+```
 
 
 
